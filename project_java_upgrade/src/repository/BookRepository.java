@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import java.util.ArrayList;
 
 import db.DB;
 
@@ -34,13 +34,14 @@ public class BookRepository {
 			System.out.println(e.getMessage());
 		}
 		finally {
-			DB.closeConnection();
 			DB.closeStatement(st);
 		}
 	}
 	
 	
-	public static void selectLivro() {
+	public static ArrayList<String> selectLivro() {
+		
+		ArrayList<String> book = new ArrayList<String>();
 		
 		Connection conn = null;
 		Statement st = null;
@@ -54,7 +55,8 @@ public class BookRepository {
 			rs = st.executeQuery("SELECT * FROM book");
 			
 			while (rs.next()) {
-				System.out.println(rs.getString("ISBN") + ", " + rs.getString("TITLE") + ", " + rs.getString("AUTOR") + ", " + rs.getInt("AVAILABLE"));
+				String dadosBook = rs.getString("ISBN") + ", " + rs.getString("TITLE") + ", " + rs.getString("AUTOR") + ", " + rs.getInt("AVAILABLE");
+				book.add(dadosBook);
 			}
 		}
 		catch (SQLException e) {
@@ -63,8 +65,7 @@ public class BookRepository {
 		finally {
 			DB.closeResultSet(rs);
 			DB.closeStatement(st);
-			DB.closeConnection();
 		}
-		
+		return book;
 	}
 }

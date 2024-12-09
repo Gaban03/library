@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import db.DB;
 
@@ -18,7 +19,7 @@ public class UserRepository {
 		try {
 			conn = DB.getConnection();
 
-			st = conn.prepareStatement("INSERT INTO user (nome) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
+			st = conn.prepareStatement("INSERT INTO user (name) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
 
 			st.setString(1, nome);
 
@@ -38,8 +39,37 @@ public class UserRepository {
 			e.printStackTrace();
 		} finally {
 			DB.closeStatement(st);
-			DB.closeConnection();
 		}
 	}
+	
+	public static ArrayList<String> UserSelect() {
+		
+		ArrayList<String> user = new ArrayList<String>();
 
+		Connection conn = null;
+		Statement st = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = DB.getConnection();
+			
+			st = conn.createStatement();
+			
+			rs = st.executeQuery("SELECT * FROM user");
+			
+			while (rs.next()) {
+				String dadosUser = rs.getString("ID_USER") + ", " + rs.getString("NAME");
+				user.add(dadosUser);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println("Erro ao selecionar usuarios: " + e.getMessage());
+		}
+		finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+		}
+		return user;
+	}
+	
 }
