@@ -173,6 +173,7 @@ public class ScreenLibrary extends JFrame {
 		textField_5.setColumns(10);
 
 		JButton btnEmprestarLivro = new JButton("Realizar Emprestimo");
+		
 		btnEmprestarLivro.setBackground(new Color(192, 192, 192));
 		btnEmprestarLivro.setBounds(358, 143, 164, 23);
 		panel_2.add(btnEmprestarLivro);
@@ -221,6 +222,7 @@ public class ScreenLibrary extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				UserRepository.UserInsert(tfNomeUsuario.getText());
 				lblUsuarioLog.setText("Usuario registrado com sucesso!");
+				tfNomeUsuario.setText("");
 			}
 		});
 		
@@ -229,6 +231,10 @@ public class ScreenLibrary extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				BookRepository.inserirLivro(textFieldTitulo.getText(),textFieldAutor.getText(),textFieldISBN.getText());
 				lblLivroLog.setText("Livro cadastrado com sucesso!");
+				
+				textFieldTitulo.setText("");
+				textFieldAutor.setText("");
+				textFieldISBN.setText("");
 			}
 		});
 		
@@ -264,5 +270,34 @@ public class ScreenLibrary extends JFrame {
 				
 			}
 		});
+		
+		btnEmprestarLivro.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        String idUsuario = textField_5.getText();
+		        String isbn = textField_4.getText();
+
+		        boolean sucesso = BookRepository.realizarEmprestimo(idUsuario, isbn);
+		        if (sucesso) {
+		            lblEmprestimoLog.setText("Empréstimo realizado com sucesso!");
+		           
+		            // Obter informações do livro pelo ISBN
+		            String detalhesLivro = BookRepository.buscarLivroPorISBN(isbn);
+
+		            // Exibindo as informações no TextArea
+		            String detalhesEmprestimo = String.format(
+		                "Empréstimo realizado com sucesso!\n\nUsuário:\nID: %s\n\nLivro:\n%s",
+		                idUsuario, detalhesLivro
+		            );
+		            textAreaLivrosEmprestados.setText(detalhesEmprestimo);
+		            
+		            textField_5.setText("");
+		            textField_4.setText("");
+		            
+		        } else {
+		            lblEmprestimoLog.setText("Erro ao realizar empréstimo. Verifique os dados.");
+		        }
+		    }
+		});
+
 	}
 }
