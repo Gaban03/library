@@ -271,19 +271,6 @@ public class ScreenLibrary extends JFrame {
 				} else {
 					System.out.println("Nenhum livro encontrado!");
 				}
-
-				ArrayList<String> emprestimos = BookRepository.selectLivro();
-
-				if (emprestimos != null) {
-					StringBuilder emprestimoTexto = new StringBuilder();
-					for (String emprestimo : emprestimos) {
-						emprestimoTexto.append(emprestimo).append("\n");
-					}
-
-					textAreaLivrosEmprestados.setText(emprestimoTexto.toString());
-				} else {
-					System.out.println("Nenhum livro encontrado!");
-				}
 			}
 		});
 
@@ -295,7 +282,13 @@ public class ScreenLibrary extends JFrame {
 				boolean sucesso = BookRepository.realizarEmprestimo(idUsuario, isbn);
 				if (sucesso) {
 					lblEmprestimoLog.setText("Empréstimo realizado com sucesso!");
-
+					
+					ArrayList<String> emprestimos = BookRepository.selectEmprestimo();
+					
+					for (String emprestimo : emprestimos) {
+						textAreaLivrosEmprestados.append(emprestimo);
+					}
+					
 					textField_5.setText("");
 					textField_4.setText("");
 
@@ -313,7 +306,13 @@ public class ScreenLibrary extends JFrame {
 				boolean sucesso = BookRepository.devolverLivro(idUsuario, isbn);
 				if (sucesso) {
 					lblEmprestimoLog.setText("Devolução realizada com sucesso!");
-
+					
+					ArrayList<String> emprestimos = BookRepository.selectEmprestimo();
+					
+					for (String emprestimo : emprestimos) {
+						textAreaLivrosEmprestados.append(emprestimo);
+					}
+					
 					textField_5.setText("");
 					textField_4.setText("");
 
