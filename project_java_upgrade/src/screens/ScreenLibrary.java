@@ -283,11 +283,13 @@ public class ScreenLibrary extends JFrame {
 				if (sucesso) {
 					lblEmprestimoLog.setText("Empréstimo realizado com sucesso!");
 					
-					ArrayList<String> emprestimos = BookRepository.selectEmprestimo();
-					
-					for (String emprestimo : emprestimos) {
-						textAreaLivrosEmprestados.append(emprestimo);
-					}
+					String detalhesLivro = BookRepository.buscarLivroPorISBN(isbn);
+
+		            String detalhesEmprestimo = String.format(
+		                "Empréstimo realizado com sucesso!\n\nUsuário:\nID: %s\n\nLivro:\n%s",
+		                idUsuario, detalhesLivro
+		            );
+		            textAreaLivrosEmprestados.setText(detalhesEmprestimo);
 					
 					textField_5.setText("");
 					textField_4.setText("");
@@ -307,11 +309,13 @@ public class ScreenLibrary extends JFrame {
 				if (sucesso) {
 					lblEmprestimoLog.setText("Devolução realizada com sucesso!");
 					
-					ArrayList<String> emprestimos = BookRepository.selectEmprestimo();
-					
-					for (String emprestimo : emprestimos) {
-						textAreaLivrosEmprestados.append(emprestimo);
-					}
+					String detalhesLivro = BookRepository.buscarLivroPorISBN(isbn);
+
+		            String detalhesEmprestimo = String.format(
+		                "Devolução realizada com sucesso!\n\nUsuário:\nID: %s\n\nLivro:\n%s",
+		                idUsuario, detalhesLivro
+		            );
+		            textAreaLivrosEmprestados.setText(detalhesEmprestimo);
 					
 					textField_5.setText("");
 					textField_4.setText("");
