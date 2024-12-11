@@ -132,6 +132,63 @@ public class BookRepository {
 	    }
 	}
 	
+	public static boolean devolverLivro(String idUsuario, String isbn) {
+	    Connection conn = null;
+	    PreparedStatement pstSelectUser = null;
+	    PreparedStatement pstSelectBook = null;
+	    PreparedStatement pstInsertLoan = null;
+	    PreparedStatement pstUpdateBook = null;
+	    ResultSet rsUser = null;
+	    ResultSet rsBook = null;
+
+	    try {
+	        conn = DB.getConnection();
+
+	        pstSelectUser = conn.prepareStatement("SELECT * FROM user WHERE ID_USER = ?");
+	        pstSelectUser.setString(1, idUsuario);
+	        rsUser = pstSelectUser.executeQuery();
+
+	        if (!rsUser.next()) {
+	            System.out.println("Usuário não encontrado.");
+	            return false;
+	        }
+
+	        pstSelectBook = conn.prepareStatement("SELECT * FROM book WHERE ISBN = ? AND AVAILABLE < 1");
+	        pstSelectBook.setString(1, isbn);
+	        rsBook = pstSelectBook.executeQuery();
+
+	        if (!rsBook.next()) {
+	            System.out.println("Livro não encontrado.");
+	            return false;
+	        }
+
+	        pstInsertLoan = conn.prepareStatement(
+	            "DELETE FROM borrow_books\r\n"
+	            + "WHERE ID_USER = ? AND ISBN = ?"
+	        );
+	        pstInsertLoan.setString(1, idUsuario);
+	        pstInsertLoan.setString(2, isbn);
+	        pstInsertLoan.executeUpdate();
+
+	        pstUpdateBook = conn.prepareStatement("UPDATE book SET AVAILABLE = AVAILABLE + 1 WHERE ISBN = ?");
+	        pstUpdateBook.setString(1, isbn);
+	        pstUpdateBook.executeUpdate();
+
+	        System.out.println("Devolução realizado com sucesso!");
+	        return true;
+	    } catch (SQLException e) {
+	        System.out.println("Erro ao realizar devolução: " + e.getMessage());
+	        return false;
+	    } finally {
+	        DB.closeResultSet(rsUser);
+	        DB.closeResultSet(rsBook);
+	        DB.closeStatement(pstSelectUser);
+	        DB.closeStatement(pstSelectBook);
+	        DB.closeStatement(pstInsertLoan);
+	        DB.closeStatement(pstUpdateBook);
+	    }
+	}
+	
 	public static String buscarLivroPorISBN(String isbn) {
 	    Connection conn = null;
 	    PreparedStatement st = null;
@@ -158,5 +215,35 @@ public class BookRepository {
 	    return detalhesLivro;
 	}
 
-
+	
+public static ArrayList<String> selectEmprestimo() {
+		
+		ArrayList<String> borrowed = new ArrayList<String>();
+		
+		Connection conn = null;
+		Statement st = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = DB.getConnection();
+			
+			st = conn.createStatement();
+			
+			rs = st.executeQuery("SELECT * FROM borrow_books");
+			
+			while (rs.next()) {
+				String dadosBorrowed = rs.getString("ID_BORROW_BOOKS") + ", " + rs.getString("ID_USER") + ", " + 
+						rs.getString("ISBN") + ", " + rs.getInt("DATA_BORROW") + ", " + rs.getInt("DATA_RETURN");
+				borrowed.add(dadosBorrowed);
+			}
+		}
+		catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		finally {
+			DB.closeResultSet(rs);
+			DB.closeStatement(st);
+		}
+		return borrowed;
+	}
 }

@@ -84,7 +84,7 @@ public class ScreenLibrary extends JFrame {
 		btnCadastrarUsuario.setBackground(new Color(192, 192, 192));
 		btnCadastrarUsuario.setBounds(355, 88, 164, 23);
 		panel.add(btnCadastrarUsuario);
-		
+
 		JLabel lblUsuarioLog = new JLabel("");
 		lblUsuarioLog.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblUsuarioLog.setBounds(20, 105, 269, 31);
@@ -135,7 +135,7 @@ public class ScreenLibrary extends JFrame {
 		btnCadastrarLivro.setBackground(new Color(192, 192, 192));
 		btnCadastrarLivro.setBounds(363, 153, 159, 23);
 		panel_1.add(btnCadastrarLivro);
-		
+
 		JLabel lblLivroLog = new JLabel("");
 		lblLivroLog.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblLivroLog.setBounds(20, 143, 269, 31);
@@ -143,7 +143,7 @@ public class ScreenLibrary extends JFrame {
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		panel_2.setBounds(10, 366, 547, 177);
+		panel_2.setBounds(10, 366, 547, 212);
 		contentPane.add(panel_2);
 		panel_2.setLayout(null);
 
@@ -173,15 +173,20 @@ public class ScreenLibrary extends JFrame {
 		textField_5.setColumns(10);
 
 		JButton btnEmprestarLivro = new JButton("Realizar Emprestimo");
-		
+
 		btnEmprestarLivro.setBackground(new Color(192, 192, 192));
 		btnEmprestarLivro.setBounds(358, 143, 164, 23);
 		panel_2.add(btnEmprestarLivro);
-		
+
 		JLabel lblEmprestimoLog = new JLabel("");
 		lblEmprestimoLog.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblEmprestimoLog.setBounds(24, 135, 269, 31);
+		lblEmprestimoLog.setBounds(24, 135, 320, 31);
 		panel_2.add(lblEmprestimoLog);
+
+		JButton btnDevolverLivro = new JButton("Devolver livro");
+		btnDevolverLivro.setBackground(Color.LIGHT_GRAY);
+		btnDevolverLivro.setBounds(358, 178, 164, 23);
+		panel_2.add(btnDevolverLivro);
 
 		TextArea textAreaUsuarios = new TextArea();
 		textAreaUsuarios.setBounds(590, 60, 532, 97);
@@ -215,8 +220,7 @@ public class ScreenLibrary extends JFrame {
 		btnAtualizar.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		btnAtualizar.setBounds(976, 10, 146, 32);
 		contentPane.add(btnAtualizar);
-		
-		
+
 		// Função do botao de cadastrar usuario
 		btnCadastrarUsuario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -225,19 +229,20 @@ public class ScreenLibrary extends JFrame {
 				tfNomeUsuario.setText("");
 			}
 		});
-		
+
 		// Função do botao de cadastrar livro
 		btnCadastrarLivro.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				BookRepository.inserirLivro(textFieldTitulo.getText(),textFieldAutor.getText(),textFieldISBN.getText());
+				BookRepository.inserirLivro(textFieldTitulo.getText(), textFieldAutor.getText(),
+						textFieldISBN.getText());
 				lblLivroLog.setText("Livro cadastrado com sucesso!");
-				
+
 				textFieldTitulo.setText("");
 				textFieldAutor.setText("");
 				textFieldISBN.setText("");
 			}
 		});
-		
+
 		// Atualiza os consoles de exibição de dados
 		btnAtualizar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -253,51 +258,69 @@ public class ScreenLibrary extends JFrame {
 				} else {
 					System.out.println("Nenhum usuario encontrado!");
 				}
-				
+
 				ArrayList<String> livros = BookRepository.selectLivro();
-				
+
 				if (livros != null) {
 					StringBuilder livrosTexto = new StringBuilder();
 					for (String livro : livros) {
 						livrosTexto.append(livro).append("\n");
 					}
-	
+
 					textAreaLivros.setText(livrosTexto.toString());
 				} else {
 					System.out.println("Nenhum livro encontrado!");
 				}
-				
-				
+
+				ArrayList<String> emprestimos = BookRepository.selectLivro();
+
+				if (emprestimos != null) {
+					StringBuilder emprestimoTexto = new StringBuilder();
+					for (String emprestimo : emprestimos) {
+						emprestimoTexto.append(emprestimo).append("\n");
+					}
+
+					textAreaLivrosEmprestados.setText(emprestimoTexto.toString());
+				} else {
+					System.out.println("Nenhum livro encontrado!");
+				}
 			}
 		});
-		
+
 		btnEmprestarLivro.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        String idUsuario = textField_5.getText();
-		        String isbn = textField_4.getText();
+			public void actionPerformed(ActionEvent e) {
+				String idUsuario = textField_5.getText();
+				String isbn = textField_4.getText();
 
-		        boolean sucesso = BookRepository.realizarEmprestimo(idUsuario, isbn);
-		        if (sucesso) {
-		            lblEmprestimoLog.setText("Empréstimo realizado com sucesso!");
-		           
-		            // Obter informações do livro pelo ISBN
-		            String detalhesLivro = BookRepository.buscarLivroPorISBN(isbn);
+				boolean sucesso = BookRepository.realizarEmprestimo(idUsuario, isbn);
+				if (sucesso) {
+					lblEmprestimoLog.setText("Empréstimo realizado com sucesso!");
 
-		            // Exibindo as informações no TextArea
-		            String detalhesEmprestimo = String.format(
-		                "Empréstimo realizado com sucesso!\n\nUsuário:\nID: %s\n\nLivro:\n%s",
-		                idUsuario, detalhesLivro
-		            );
-		            textAreaLivrosEmprestados.setText(detalhesEmprestimo);
-		            
-		            textField_5.setText("");
-		            textField_4.setText("");
-		            
-		        } else {
-		            lblEmprestimoLog.setText("Erro ao realizar empréstimo. Verifique os dados.");
-		        }
-		    }
+					textField_5.setText("");
+					textField_4.setText("");
+
+				} else {
+					lblEmprestimoLog.setText("Erro ao realizar empréstimo. Verifique os dados.");
+				}
+			}
 		});
 
+		btnDevolverLivro.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String idUsuario = textField_5.getText();
+				String isbn = textField_4.getText();
+
+				boolean sucesso = BookRepository.devolverLivro(idUsuario, isbn);
+				if (sucesso) {
+					lblEmprestimoLog.setText("Devolução realizada com sucesso!");
+
+					textField_5.setText("");
+					textField_4.setText("");
+
+				} else {
+					lblEmprestimoLog.setText("Erro ao realizar devolução. Verifique os dados.");
+				}
+			}
+		});
 	}
 }
